@@ -11,7 +11,7 @@ interface ComponentProps {
     planet: PlanetProps,
     radius: RadiusProps,
     options: OptionsProps,
-    setSelectedPlanet: (planet: PlanetProps) => void;
+    setSelectedPlanet: (planet: PlanetProps | null) => void;
     selectedPlanet: PlanetProps | null;
     ringsEnabled?: boolean;
 }
