@@ -1,33 +1,3 @@
-
-/*
-planet={{
-                        name: planet.name,
-                        color: planet.color,
-                        description: planet.description,
-                    }}
-                    radius={{
-                        x: planet.xRadius,
-                        z: planet.zRadius,
-                        size: planet.size,
-                    }}
-                    options={{
-                        distance: planet.distance,
-                        speed: planet.speed,
-                        displacement: {
-                            texture: planet.displacementTexture,
-                            scale: planet.displacementScale,
-                        },
-                        map: {
-                            texture: planet.mapTexture,
-                            scale: planet.mapScale,
-                        },
-                        emissive: {
-                            color: planet.emissiveColor,
-                            intensity: planet.emissiveIntensity,
-                        },
-                    }}
-*/
-
 const planetData = [
     {
         name: 'Mercury',

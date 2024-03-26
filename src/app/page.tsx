@@ -1,9 +1,8 @@
 "use client"
 
-import Image from "next/image";
 import React, { useState } from "react";
-import { Canvas, extend, useFrame } from "@react-three/fiber";
-import { Effects, Html, OrbitControls } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import planetData from "./planetdata";
 import { EffectComposer, Bloom, Vignette, ToneMapping } from "@react-three/postprocessing";
@@ -73,6 +72,7 @@ export default function Home() {
 
                 <Lights />
                 <OrbitControls />
+
                 <EffectComposer>
                     <Bloom mipmapBlur luminanceThreshold={1} levels={8} intensity={7} />
                     <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />

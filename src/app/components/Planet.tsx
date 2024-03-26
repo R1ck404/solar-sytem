@@ -1,11 +1,10 @@
 "use client";
 
-import { Circle, Effects, Html, MeshDistortMaterial } from "@react-three/drei";
+import { Html } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import Ecliptic from "./Ecliptic";
 import * as THREE from "three";
-import { EffectComposer, DepthOfField, Bloom } from "@react-three/postprocessing"; // Import post-processing modules
 
 interface ComponentProps {
     planet: PlanetProps,
@@ -122,7 +121,6 @@ function Planet({ planet, radius, options, setSelectedPlanet, selectedPlanet, ri
 
     const displacementTexture = new THREE.TextureLoader().load(options.displacement.texture);
     const sunTexture = new THREE.TextureLoader().load(options.map.texture);
-    const saturnRingsTexture = new THREE.TextureLoader().load("/images/2k_saturn_ring.png");
 
     return (
         <>
