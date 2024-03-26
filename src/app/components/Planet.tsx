@@ -1,6 +1,6 @@
 "use client";
 
-import { Html } from "@react-three/drei";
+import { Html, Outlines } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import Ecliptic from "./Ecliptic";
@@ -19,6 +19,7 @@ export interface PlanetProps {
     name: string;
     color: string;
     description: string;
+    details?: any;
 }
 
 interface RadiusProps {
@@ -56,8 +57,7 @@ function Planet({ planet, radius, options, setSelectedPlanet, selectedPlanet, ri
     const [isHovered, setIsHovered] = useState(false);
     const [isPhysyclyPaused, setIsPhysyclyPaused] = useState(false);
     const [position, setPosition] = useState({ x: 0, z: 0 });
-    const [isSelected, setIsSelected] = useState(false);
-    const { gl, scene, camera } = useThree();
+    const { camera } = useThree();
 
     useEffect(() => {
         if (isHovered) {
@@ -66,7 +66,7 @@ function Planet({ planet, radius, options, setSelectedPlanet, selectedPlanet, ri
             setIsPhysyclyPaused(false);
 
             if (!planetRef.current) return;
-            if (isSelected) return;
+            if (selectedPlanet?.name === planet.name) return;
 
             planetRef.current.position.set(position.x, 0, position.z);
         }
@@ -117,7 +117,7 @@ function Planet({ planet, radius, options, setSelectedPlanet, selectedPlanet, ri
         camera.position.set(planetRef.current.position.x, planetRef.current.position.y, planetRef.current.position.z + 3);
         camera.lookAt(planetRef.current.position);
 
-    }, [isSelected]);
+    }, [selectedPlanet?.name === planet.name]);
 
     const displacementTexture = new THREE.TextureLoader().load(options.displacement.texture);
     const sunTexture = new THREE.TextureLoader().load(options.map.texture);
@@ -129,7 +129,7 @@ function Planet({ planet, radius, options, setSelectedPlanet, selectedPlanet, ri
                 onPointerOver={(event) => setIsHovered(true)}
                 onPointerOut={(event) => setIsHovered(false)}
                 onClick={(event) => {
-                    setSelectedPlanet(isSelected ? null : planet);
+                    setSelectedPlanet(selectedPlanet?.name === planet.name ? null : planet);
                 }}
             >
                 {planet?.name.toLocaleLowerCase() === "saturn" && <>
@@ -152,22 +152,11 @@ function Planet({ planet, radius, options, setSelectedPlanet, selectedPlanet, ri
                     displacementScale={options.displacement.scale}
                     map={sunTexture}
                     toneMapped={false}
+
                 />
+
                 {isHovered && (
-                    <Html>
-                        <div
-                            style={{
-                                position: "absolute",
-                                top: "-50px",
-                                color: "white",
-                                fontSize: "1.5rem",
-                                pointerEvents: "none",
-                                width: "100%",
-                            }}
-                        >
-                            {planet.name}
-                        </div>
-                    </Html>
+                    <Outlines visible={true} color="white" />
                 )}
             </mesh>
 

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { MeshDistortMaterial, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import planetData from "./planetdata";
 import { EffectComposer, Bloom, Vignette, ToneMapping } from "@react-three/postprocessing";
@@ -10,16 +10,33 @@ import StarsBackground from "./components/Stars";
 import Lights from "./components/Lighting";
 import Planet, { PlanetProps } from "./components/Planet";
 import { ToneMappingMode } from 'postprocessing';
-import { Orbit, CircleArrowLeft, PlusIcon, MinusIcon } from 'lucide-react';
+import { Orbit, CircleArrowLeft, PlusIcon, MinusIcon, Earth, CircleArrowRight } from 'lucide-react';
+import Asteroid from "./components/Asteroid";
 
 export default function Home() {
     const [selectedPlanet, setSelectedPlanet] = useState<PlanetProps | null>(null);
     const [speedMultiplier, setSpeedMultiplier] = useState(1);
     const [ringEnabled, setRingEnabled] = useState(false);
+    const [planetMenu, setPlanetMenu] = useState(false);
 
     return (
         <main className="min-h-screen">
-            <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-[1000] px-2 py-1 rounded-full bg-stone-900 border-stone-700 border flex space-x-2 items-center">
+            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-[1000] px-2 py-1 rounded-full bg-stone-900 border-stone-700 border flex space-x-2 items-center">
+
+                <button onClick={() => setPlanetMenu(!planetMenu)} className={`text-white p-2 rounded-lg transition-all ${planetMenu ? "hidden opacity-0" : "opacity-100 flex"}`}>
+                    <Earth size={24} />
+                </button>
+                <div className={`transition-all ${planetMenu ? "flex opacity-100" : "hidden opacity-0"} space-x-2 items-center w-fit`}>
+                    <button onClick={() => setPlanetMenu(!planetMenu)} className="text-white p-2 rounded-lg">
+                        <CircleArrowRight />
+                    </button>
+                    {planetData.map((planet) => (
+                        <button key={planet.name} onClick={() => setSelectedPlanet(planet)} className="text-white p-2 rounded-lg">
+                            <img src={`/images/icons/${planet.name.toLocaleLowerCase()}.png`} alt={planet.name} className="h-8 w-8 rounded-full cursor-pointer" />
+                        </button>
+                    ))}
+                </div>
+                <div className="bg-stone-700 h-8 w-[1px]" />
                 <button onClick={() => setSpeedMultiplier(speedMultiplier / 2)} className="text-white p-2 rounded-lg">
                     <MinusIcon size={24} />
                 </button>
@@ -35,6 +52,7 @@ export default function Home() {
             <Canvas camera={{ position: [0, 20, 25], fov: 50 }} scene={{}} className="h-screen" style={{ height: "100vh" }}>
                 <StarsBackground />
                 <Sun />
+                {/* <Asteroid /> */}
 
                 {planetData.map((planet) => (
                     <Planet key={planet.name}
@@ -42,6 +60,7 @@ export default function Home() {
                             name: planet.name,
                             color: planet.color as unknown as string || "#ffffff",
                             description: planet.description,
+                            details: planet.details,
                         }}
                         radius={{
                             x: planet.xRadius,
@@ -100,15 +119,21 @@ export default function Home() {
                                 <div className="space-y-16 ml-4 justify-center flex flex-col h-full text-white">
                                     <div className="space-y-4">
                                         <p className="text-xl md:text-2xl lg:text-4xl" style={{ color: selectedPlanet.color }}>Diameter</p>
-                                        <h1 className="text-2xl md:text-4xl lg:text-6xl" id="diameter">6,779 km</h1>
+                                    <h1 className="text-2xl md:text-4xl lg:text-6xl" id="diameter">
+                                        {selectedPlanet?.details?.diameter}
+                                    </h1>
                                     </div>
                                     <div className="space-y-4">
                                         <p className="text-xl md:text-2xl lg:text-4xl" style={{ color: selectedPlanet.color }}>Distance from sun</p>
-                                        <h1 className="text-2xl md:text-4xl lg:text-6xl" id="distance">227,943,824 km</h1>
+                                    <h1 className="text-2xl md:text-4xl lg:text-6xl" id="distance">
+                                        {selectedPlanet?.details?.distance}
+                                    </h1>
                                     </div>
                                     <div className="space-y-4">
                                         <p className="text-xl md:text-2xl lg:text-4xl" style={{ color: selectedPlanet.color }}>Length of year</p>
-                                        <h1 className="text-2xl md:text-4xl lg:text-6xl" id="yeaLength">1.9 Earth Years</h1>
+                                    <h1 className="text-2xl md:text-4xl lg:text-6xl" id="yeaLength">
+                                        {selectedPlanet?.details?.year}
+                                    </h1>
                                     </div>
                                     <p className="text-lg md:text-xl lg:text-2xl">{selectedPlanet.description}</p>
                                 </div>
@@ -127,7 +152,7 @@ function Sun() {
     return (
         <mesh>
             <sphereGeometry args={[3, 32, 32]} />
-            <meshStandardMaterial emissive="#ffbb00" emissiveIntensity={4} displacementMap={displacementTexture} displacementScale={.3} map={sunTexture} toneMapped={false} />
+            <MeshDistortMaterial distort={.2} emissive="#ffbb00" emissiveIntensity={4} displacementMap={displacementTexture} displacementScale={.3} map={sunTexture} toneMapped={false} />
         </mesh>
     );
 }
