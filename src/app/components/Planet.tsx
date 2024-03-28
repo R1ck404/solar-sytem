@@ -5,6 +5,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import Ecliptic from "./Ecliptic";
 import * as THREE from "three";
+import FakeGlowMaterial from "./glowMaterial";
 
 interface ComponentProps {
     planet: PlanetProps,
@@ -122,8 +123,24 @@ function Planet({ planet, radius, options, setSelectedPlanet, selectedPlanet, ri
     const displacementTexture = new THREE.TextureLoader().load(options.displacement.texture);
     const sunTexture = new THREE.TextureLoader().load(options.map.texture);
 
+    var vertexShader = [
+        'varying vec3 vNormal;',
+        'void main() {',
+        'vNormal = normalize( normalMatrix * normal );',
+        'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+        '}'
+    ].join('\n')
+
+    var fragmentShader = [
+        'varying vec3 vNormal;',
+        'void main() {',
+        'float intensity = pow( 0.8 - dot( vNormal, vec3( 0, 0, 1.0 ) ), 12.0 );',
+        'gl_FragColor = vec4( 1, 1.0, 1.0, 1.0 ) * intensity;',
+        '}'
+    ].join('\n');
     return (
         <>
+
             <mesh
                 ref={planetRef}
                 onPointerOver={(event) => setIsHovered(true)}
@@ -131,15 +148,30 @@ function Planet({ planet, radius, options, setSelectedPlanet, selectedPlanet, ri
                 onClick={(event) => {
                     setSelectedPlanet(selectedPlanet?.name === planet.name ? null : planet);
                 }}
+                receiveShadow castShadow
             >
                 {planet?.name.toLocaleLowerCase() === "saturn" && <>
                     <mesh
                         ref={ringRef}
                         rotation={[0.5 * Math.PI, .2, 0]}
                         position={[0, 0, 0]}
+                        receiveShadow castShadow
                     >
                         <torusGeometry args={[radius.size * 47, radius.size * 6, 2, 100]} />
-                        <meshStandardMaterial color={"#b19c87"} />
+                        <meshStandardMaterial color={"#b19c87"} opacity={0.7} transparent={true} />
+                    </mesh>
+                </>}
+
+                {planet?.name.toLocaleLowerCase() === "earth" && <>
+                    <mesh
+                        ref={ringRef}
+                        position={[3 + radius.size, 0, 2 + radius.size]}
+                        receiveShadow castShadow
+                    >
+                        {/* sphere aka moon */}
+                        <sphereGeometry args={[0.005 * 30, 32, 32]} />
+                        <meshStandardMaterial color={"#ffffff"} />
+
                     </mesh>
                 </>}
 

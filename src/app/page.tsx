@@ -17,25 +17,14 @@ export default function Home() {
     const [selectedPlanet, setSelectedPlanet] = useState<PlanetProps | null>(null);
     const [speedMultiplier, setSpeedMultiplier] = useState(1);
     const [ringEnabled, setRingEnabled] = useState(false);
-    const [planetMenu, setPlanetMenu] = useState(false);
+    const [realScaling, setRealScaling] = useState(false);
 
     return (
         <main className="min-h-screen">
             <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-[1000] px-2 py-1 rounded-full bg-stone-900 border-stone-700 border flex space-x-2 items-center">
-
-                <button onClick={() => setPlanetMenu(!planetMenu)} className={`text-white p-2 rounded-lg transition-all ${planetMenu ? "hidden opacity-0" : "opacity-100 flex"}`}>
+                <button aria-label="Use real scaling" onClick={() => setRealScaling(!realScaling)} className="text-white p-2 rounded-lg">
                     <Earth size={24} />
                 </button>
-                <div className={`transition-all ${planetMenu ? "flex opacity-100" : "hidden opacity-0"} space-x-2 items-center w-fit`}>
-                    <button onClick={() => setPlanetMenu(!planetMenu)} className="text-white p-2 rounded-lg">
-                        <CircleArrowRight />
-                    </button>
-                    {planetData.map((planet) => (
-                        <button key={planet.name} onClick={() => setSelectedPlanet(planet)} className="text-white p-2 rounded-lg">
-                            <img src={`/images/icons/${planet.name.toLocaleLowerCase()}.png`} alt={planet.name} className="h-8 w-8 rounded-full cursor-pointer" />
-                        </button>
-                    ))}
-                </div>
                 <div className="bg-stone-700 h-8 w-[1px]" />
                 <button onClick={() => setSpeedMultiplier(speedMultiplier / 2)} className="text-white p-2 rounded-lg">
                     <MinusIcon size={24} />
@@ -49,10 +38,10 @@ export default function Home() {
                     <Orbit size={24} />
                 </button>
             </div>
-            <Canvas camera={{ position: [0, 20, 25], fov: 50 }} scene={{}} className="h-screen" style={{ height: "100vh" }}>
+            <Canvas shadows camera={{ position: [0, 20, 25], fov: 50 }} scene={{}} className="h-screen" style={{ height: "100vh" }}>
                 <StarsBackground />
                 <Sun />
-                {/* <Asteroid /> */}
+                <Asteroid xRadius={17.52} zRadius={535} speed={9.012256710526316e-4 * speedMultiplier} color="#ffffff" />
 
                 {planetData.map((planet) => (
                     <Planet key={planet.name}
@@ -62,13 +51,19 @@ export default function Home() {
                             description: planet.description,
                             details: planet.details,
                         }}
-                        radius={{
-                            x: planet.xRadius,
-                            z: planet.zRadius,
-                            size: planet.size,
-                        }}
+                        radius={
+                            realScaling ? {
+                                x: planet.real_data.xRadius,
+                                z: planet.real_data.zRadius,
+                                size: planet.real_data.size,
+                            } : {
+                                x: planet.xRadius,
+                                z: planet.zRadius,
+                                size: planet.size,
+                            }
+                        }
                         options={{
-                            distance: planet.distance,
+                            distance: planet.distance ?? 0,
                             speed: planet.speed * speedMultiplier,
                             displacement: {
                                 texture: planet.displacementTexture,
@@ -90,7 +85,7 @@ export default function Home() {
                 ))}
 
                 <Lights />
-                <OrbitControls />
+                <OrbitControls minZoom={0.01} maxZoom={100} maxDistance={475} />
 
                 <EffectComposer>
                     <Bloom mipmapBlur luminanceThreshold={1} levels={8} intensity={7} />
@@ -151,7 +146,7 @@ function Sun() {
     const sunTexture = new THREE.TextureLoader().load("/images/2k_sun.jpg");
     return (
         <mesh>
-            <sphereGeometry args={[3, 32, 32]} />
+            <sphereGeometry args={[1.4, 32, 32]} />
             <MeshDistortMaterial distort={.2} emissive="#ffbb00" emissiveIntensity={4} displacementMap={displacementTexture} displacementScale={.3} map={sunTexture} toneMapped={false} />
         </mesh>
     );
