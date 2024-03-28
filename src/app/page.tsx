@@ -63,7 +63,6 @@ export default function Home() {
                             }
                         }
                         options={{
-                            distance: planet.distance ?? 0,
                             speed: planet.speed * speedMultiplier,
                             displacement: {
                                 texture: planet.displacementTexture,

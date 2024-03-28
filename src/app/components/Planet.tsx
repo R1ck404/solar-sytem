@@ -30,7 +30,6 @@ interface RadiusProps {
 }
 
 interface OptionsProps {
-    distance: number;
     speed: number;
     displacement: DisplacementProps;
     map: MapProps;
